@@ -1,22 +1,11 @@
 from pandas import DataFrame
-#I dont believe we need this remove space, but it is still good to document just in case. 
-def remove_space(file):
-    #this function will remove empty space from our textfile
-    import sys
-    with open(file) as f, open(
-            '/Users/colegulledge/Desktop/SPURSTECH/python_chatbot/no_space_dialogue_2nd_file.txt', 'w') as outfile:
-        for line in f:
-            if not line.isspace():
-                sys.stdout.write(line)
-                outfile.write(line)
-    return True
-
-
+import numpy as np
+import sys
 
 #This gathers all words between "dialogue" and "id", thus only getting doctor, patient convos
 #make an empty textfile and write output data to it.
 def patient_doc_convo(file):
-    with open(file) as infile, open('textfile3_cleaned_uneven_pat_doc.txt', 'w') as outfile:
+    with open(file) as infile, open('DESIRED_FILE_NAME', 'w') as outfile:
         copy = False
         for line in infile:
             if line.strip() == "Dialogue":
@@ -32,31 +21,45 @@ def patient_doc_convo(file):
 # From here, we split the file into a list on patient, thus creating a list array
 ## of each conversation, we then count the occurances of "Patient:" and "Doctor:"
 ## to ensure we have the same amount of question and answers for analysis.
+##once confirmed, we pass the list into its pandas dataframe.
 def patient_doctor_count(file):
     file = open(file, "rt")
     data = file.read()
     list_result = data.split("Patient:")
-    length_list = (len(list_result))
-    print(f'The are a total of {length_list} Q and As')
+
     doctor_cnt = (data.count("Doctor:"))
     print(f'There are total of {doctor_cnt} Doctors:')
     patient_cnt = (data.count("Patient:"))
     print(f'There are a total of {patient_cnt} Patients:')
+    if doctor_cnt == patient_cnt:
+        pass
+    else:
+        sys.exit("ahhh!!! Something is wrong with your dialogue!!, return and fix the errors,"
+                 "try Hey Doctor: .. or refer to the log file and see what must"
+                 "be hard removed..")
 
-#Remove whitespaces and split on doctor into individual elements.. waiting for proper clean before
-##we do so.
-def split_doctors():
     new_list = []
     for el in list_result:
-        #x = el.strip()
-        x = el.replace('\n' , '')
-        y = x.split('Doctor:')
-        new_list.append(y)
 
-#Push to Pandas dataframe and check for null values
-##this will be the conclusion and ready for analysis, if proven there are no null values.
+         x = el.replace('\n' , '')
+         y = x.split('Doctor:')
+         new_list.append(y)
+    new_list.pop(0)
 
-# df1 = DataFrame(new_list,columns=['Question','Answer'])
-# df1.drop(df1.index[:1], inplace=True)
-# print(df1)
-# print((df1.isna().sum()))
+    length_new_list = (len(new_list))
+
+    print(f'There are a total of {length_new_list} Q and As')
+
+    df1 = DataFrame(new_list, columns=['Question', 'Answer'])
+    df1.drop(df1.index[:1], inplace=True)
+
+    #FIRST ROW IS NULL
+    print((df1.isna().sum()))
+    print(df1.head())
+
+
+#patient_doctor_count('FINAL_TEXT_FILE2_CLEANED.txt')
+#patient_doctor_count('FINAL_TEXT_FILE3_CLEANED.txt')
+#patient_doctor_count('FINAL_TEXT_FILE2_CLEANED.txt')
+#patient_doctor_count('FINAL_TEXT_FILE1_CLEANED.txt')
+patient_doctor_count('MASTER_TEXT_FILE.txt')
